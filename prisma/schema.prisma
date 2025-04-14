@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  profile   String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Post     Post[]
+  comments comment[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String   @unique
+  content   String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Add relation fields
+  authorId  Int // Foreign key
+  author    Users    @relation(fields: [authorId], references: [id])
+
+  // Add relation fields
+  categoryId   Int // Foreign key
+  postCategory category  @relation(fields: [categoryId], references: [id])
+  comments     comment[]
+}
+
+model category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  Post Post[]
+}
+
+model comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Add relation fields
+  authorId Int // Foreign key
+  author   Users @relation(fields: [authorId], references: [id])
+
+  postId Int // Foreign key
+  post   Post @relation(fields: [postId], references: [id])
+}
+
+
